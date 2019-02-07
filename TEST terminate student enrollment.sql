@@ -15,14 +15,11 @@ CREATE PROCEDURE `terminate_student_enrollment`(
   WithdrawalDate_in date
 )
 BEGIN
-UPDATE classparticipant
-	INNER JOIN student ON student.ID_Student = classparticipant.ID_Student
-	INNER JOIN class ON classparticipant.ID_Class = class.ID_Class
-	INNER JOIN course ON class.ID_Course = course.ID_Course
-SET classparticipant.EndDate = WithdrawalDate_in
-	WHERE student.StudentID = StudentID_in
-	AND course.CourseCode = CourseCode_in
-	AND class.Section = Section_in;
+UPDATE classparticipant cp
+SET EndDate = WithdrawalDate_in
+WHERE StudentID_in IN (SELECT StudentID FROM student s WHERE s.ID_student = cp.ID_Student)
+AND CourseCode_in IN (SELECT CourseCode FROM course co WHERE co.CourseCode = CourseCode_in)
+AND Section_in IN (SELECT Section FROM class c WHERE c.ID_Class = cp.ID_Class); 
 
 -- DISPLAY RESULTS
 SELECT * 
